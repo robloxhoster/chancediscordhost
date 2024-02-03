@@ -14,14 +14,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16' # Update to version 20 or higher
+          node-version: '16'
       
       - name: Install dependencies
         run: npm install
-
+      
       - name: Send roll result to Discord
-        run: |
-          node send-roll-result.js
+        run: node send-roll-result.js
         env:
-          MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
