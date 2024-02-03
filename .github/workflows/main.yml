@@ -1,0 +1,25 @@
+name: Send Roll Result to Discord
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  send-roll-result:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Extract Roll Result
+        id: extract-roll
+        run: |
+          roll_result=$(jq -r .issue.body $GITHUB_EVENT_PATH)
+          echo "::set-output name=roll_result::$roll_result"
+
+      - name: Send Roll Result to Discord
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d '{"content": "Roll Result: '${{ steps.extract-roll.outputs.roll_result }}'"}' $WEBHOOK_URL
