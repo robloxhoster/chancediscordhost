@@ -1,40 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roll Result</title>
-</head>
-<body>
-    <h1>Roll Result</h1>
-    <p id="rollResult"></p>
+const fetch = require('node-fetch');
 
-    <script>
-        // Function to send roll result to Discord
-        async function sendRollToDiscord(rollResult) {
-            const discordWebhookURL = 'https://discord.com/api/webhooks/1202441107519316068/cwCxDXjoJw04JXgMVeG3fFXkfnHF6tR82RcgmZCpZTsHyvdCx44iRff33zYbm3-ZvHKd'; // Replace with your Discord webhook URL
+async function sendRollResultToDiscord(rollResult, discordWebhookURL) {
+    try {
+        const response = await fetch(discordWebhookURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                content: `Player rolled: ${rollResult} WOAH!`,
+            }),
+        });
 
-            try {
-                await fetch(discordWebhookURL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        content: `Player rolled: ${rollResult}`,
-                    }),
-                });
-                console.log('Roll result sent to Discord');
-            } catch (error) {
-                console.error('Failed to send roll result to Discord:', error);
-            }
+        if (!response.ok) {
+            console.error(`Failed to send roll result to Discord: HTTP ${response.status} ${response.statusText}`);
+        } else {
+            console.log('Roll result successfully sent to Discord');
         }
+    } catch (error) {
+        console.error('Error occurred while sending roll result to Discord:', error);
+    }
+}
 
-        // Example usage:
-        const playerName = "example_player";
-        const rollResult = 42;
-        document.getElementById('rollResult').textContent = `${playerName} rolled: ${rollResult}`;
-        sendRollToDiscord(rollResult);
-    </script>
-</body>
-</html>
+// Extract roll result from the issue title
+const issueTitle = process.env.GITHUB_EVENT.issue.title;
+const rollResult = issueTitle.split(' ')[0]; // Assuming roll result is at the beginning of the title
+
+// Extract Discord webhook URL from environment variables
+const discordWebhookURL = process.env.DISCORD_WEBHOOK_URL;
+
+// Send roll result to Discord
+sendRollResultToDiscord(rollResult, discordWebhookURL);
+
