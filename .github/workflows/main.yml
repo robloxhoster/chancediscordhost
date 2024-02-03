@@ -18,9 +18,10 @@ jobs:
       
       - name: Install dependencies
         run: npm install
-      
+
       - name: Send roll result to Discord
-        run: node send-roll-result.js
+        run: |
+          node send-roll-result.js
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
