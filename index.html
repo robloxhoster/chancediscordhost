@@ -1,0 +1,41 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const fetch = require('node-fetch'); // Use a library like node-fetch to make HTTP requests
+
+const app = express();
+const port = 3000;
+
+app.use(bodyParser.json());
+
+// Endpoint to receive requests from Roblox
+app.post('/sendToDiscord', async (req, res) => {
+    try {
+        const discordWebhookURL = 'https://discord.com/api/webhooks/1202441107519316068/cwCxDXjoJw04JXgMVeG3fFXkfnHF6tR82RcgmZCpZTsHyvdCx44iRff33zYbm3-ZvHKd'; // Your Discord webhook URL
+        const rollResult = req.body.rollResult; // Assuming the roll result is sent in the request body
+
+        // Forward the roll result to Discord
+        await fetch(discordWebhookURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                content: null,
+                embeds: [{
+                    title: 'Roll Result',
+                    description: rollResult,
+                    color: 65280 // Green color for the embed
+                }]
+            })
+        });
+
+        res.status(200).send('Roll result sent to Discord');
+    } catch (error) {
+        console.error('Failed to send roll result to Discord:', error);
+        res.status(500).send('Internal server error');
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Proxy server listening at http://localhost:${port}`);
+});
