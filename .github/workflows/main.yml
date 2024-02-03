@@ -20,5 +20,6 @@ jobs:
         run: npm install axios
       
       - name: Send roll result to Discord
-        run: |
-          node -e "console.log('Hello from Node.js ' + process.version)"
+        run: node send-roll-result.js
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
