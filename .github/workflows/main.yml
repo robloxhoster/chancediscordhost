@@ -1,25 +1,26 @@
-name: Send Roll Result to Discord
+name: Roll Result Notification
 
 on:
   issues:
     types: [opened]
 
 jobs:
-  send-roll-result:
+  notify-discord:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Extract Roll Result
-        id: extract-roll
-        run: |
-          roll_result=$(jq -r .issue.body $GITHUB_EVENT_PATH)
-          echo "::set-output name=roll_result::$roll_result"
-
-      - name: Send Roll Result to Discord
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16' # Update to version 20 or higher
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Send roll result to Discord
+        run: node send-roll-result.js
         env:
-          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-          curl -X POST -H "Content-Type: application/json" -d '{"content": "Roll Result: '${{ steps.extract-roll.outputs.roll_result }}'"}' $WEBHOOK_URL
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
